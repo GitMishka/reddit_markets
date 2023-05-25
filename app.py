@@ -19,7 +19,6 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 
-# Create table if it doesn't exist
 cur.execute("""
     CREATE TABLE IF NOT EXISTS gundeals (
         id TEXT PRIMARY KEY,
@@ -43,16 +42,14 @@ while True:
             'Post ID': post.id,
             'Post Link': post.url
         }
-        # Extract first word from post title and stop at ']'
+       
         category = ''
         for char in post.title:
             if char == ']':
                 break
             elif char != ' ':
                 category += char
-        post_data['Category'] = category[1:] if category else None  # Remove first character of the first word
-
-        # Extract price from post title
+        post_data['Category'] = category[1:] if category else None 
         price = None
         if '$' in post.title:
             price_start = post.title.index('$') + 1
@@ -60,7 +57,7 @@ while True:
             if price_end == -1:
                 price_end = len(post.title)
             price_str = post.title[price_start:price_end]
-            price_str = price_str.replace(',', '')  # Remove commas from price string
+            price_str = price_str.replace(',', '')  
             if 'K' in price_str:
                 price = int(float(price_str[:-1]) * 1000)
             else:
@@ -71,23 +68,27 @@ while True:
 
     df = pd.DataFrame(data)
     print(posts)
-    print(df)  # You can modify this part to perform any desired operations with the dataframe
+    print(df)  
 
-    # Insert data into the database
+
     for post in data:
-        # Fetch price and category from post data
+
         price = post['Price']
         category = post['Category']
 
+        # cur.execute("""
+        #     INSERT INTO gundeals (id, title, post_time, url, price, category)
+        #     VALUES (%s, %s, %s, %s, %s, %s)
+        # """, (post['Post ID'], post['Post Title'], post['Post Time'], post['Post Link'], price, category))
         cur.execute("""
             INSERT INTO gundeals (id, title, post_time, url, price, category)
             VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (id) DO NOTHING
         """, (post['Post ID'], post['Post Title'], post['Post Time'], post['Post Link'], price, category))
 
-    # Commit the changes and close the database connection
     conn.commit()
 
-    time.sleep(600)  # Sleep for 10 minutes before collecting the next set of posts
+    time.sleep(600)
 
 cur.close()
 conn.close()
