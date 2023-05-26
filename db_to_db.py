@@ -6,7 +6,7 @@ import psycopg2
 
 conn = psycopg2.connect(
     host="database-1.cueq5a3aruqx.us-east-2.rds.amazonaws.com",
-    database="db1",
+    database="backup_db",
     user="postgres",
     password="Manonthemoon123"
 )
@@ -18,3 +18,4 @@ cur.execute("""
         avg_price FLOAT
     )
 """)
+print(cur.statusmessage)
