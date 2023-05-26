@@ -59,9 +59,15 @@ while True:
             price_str = post.title[price_start:price_end]
             price_str = price_str.replace(',', '')  
             if 'K' in price_str:
-                price = int(float(price_str[:-1]) * 1000)
+                try:
+                    price = int(float(price_str[:-1]) * 1000)
+                except ValueError:
+                    price = None
             else:
-                price = float(price_str)
+                try:
+                    price = float(price_str)
+                except ValueError:
+                    price = None
         post_data['Price'] = price
 
         data.append(post_data)
@@ -76,10 +82,6 @@ while True:
         price = post['Price']
         category = post['Category']
 
-        # cur.execute("""
-        #     INSERT INTO gundeals (id, title, post_time, url, price, category)
-        #     VALUES (%s, %s, %s, %s, %s, %s)
-        # """, (post['Post ID'], post['Post Title'], post['Post Time'], post['Post Link'], price, category))
         cur.execute("""
             INSERT INTO gundeals (id, title, post_time, url, price, category)
             VALUES (%s, %s, %s, %s, %s, %s)
