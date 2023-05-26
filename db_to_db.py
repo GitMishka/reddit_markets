@@ -13,7 +13,7 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 cur.execute("""
-    CREATE TABLE IF NOT EXISTS gundeals_avgprice (
+    CREATE TABLE IF NOT EXISTS avgprice (
         category TEXT,
         avg_price FLOAT
     )
