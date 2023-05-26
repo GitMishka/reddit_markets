@@ -31,9 +31,9 @@ s3 = boto3.client(
     aws_access_key_id='AKIAULBW5F545X3NIB54',
     aws_secret_access_key='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',
     region_name='us-east-2' 
+)
 
 bucket_name = "gundealsbucket1"
-
 s3.upload_file(csv_filename, bucket_name, csv_filename)
 
 cur.close()
