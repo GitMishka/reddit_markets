@@ -1,4 +1,3 @@
-# config.py
 
 # Reddit API
 reddit_username = "Searchbot_01"
