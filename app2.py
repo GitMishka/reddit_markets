@@ -4,24 +4,27 @@ import time
 import psycopg2
 import requests
 from twilio.rest import Client
+import config  # import the config module
 
 def shorten_url(url):
     response = requests.get('http://tinyurl.com/api-create.php?url=' + url)
     return response.text
 
-user_agent = "Searchbot_01"
-reddit = praw.Reddit(username="Searchbot_01",
-                     password="aaaa1111",
-                     client_id="Ai32qfXNqvGuMEvHFFMlAw",
-                     client_secret="IG5XKjyUGkcG2cgXfBSwVvalMTxFRg",
-                     user_agent=user_agent,
-                     check_for_async=False)
+user_agent = config.reddit_username
+reddit = praw.Reddit(
+    username=config.reddit_username,
+    password=config.reddit_password,
+    client_id=config.reddit_client_id,
+    client_secret=config.reddit_client_secret,
+    user_agent=user_agent,
+    check_for_async=False
+)
 
 conn = psycopg2.connect(
-    host="database-1.cueq5a3aruqx.us-east-2.rds.amazonaws.com",
-    database="postgres",
-    user="postgres",
-    password="Manonthemoon123"
+    host=config.pg_host,
+    database=config.pg_database,
+    user=config.pg_user,
+    password=config.pg_password
 )
 cur = conn.cursor()
 
@@ -49,11 +52,7 @@ cur.execute("""
 
 subreddit = reddit.subreddit('gundeals')
 
-# Add your Twilio details
-twilio_account_sid = "ACd2079bd46f13974225b28ef06255af01"
-twilio_auth_token = "fc48aa972b023395d213c11a148238c1"
-twilio_phone_number = "+18334633894"
-twilio_client = Client(twilio_account_sid, twilio_auth_token)
+twilio_client = Client(config.twilio_account_sid, config.twilio_auth_token)
 
 # Add your items here
 items_to_search = ["[Handgun]", "item2", "item3"]
@@ -104,8 +103,8 @@ while True:
             short_url = shorten_url(post.url)
             message = twilio_client.messages.create(
                 body=f"New post found: {post.title},{short_url},{price}",
-                from_=twilio_phone_number,
-                to="14232272113"
+                from_=config.twilio_phone_number,
+                to=config.twilio_to_number
             )
 
             # Insert the post into the sent_gundeals table
