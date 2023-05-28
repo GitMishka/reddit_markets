@@ -17,3 +17,8 @@ twilio_account_sid = "ACd2079bd46f13974225b28ef06255af01"
 twilio_auth_token = "fc48aa972b023395d213c11a148238c1"
 twilio_phone_number = "+18334633894"
 twilio_to_number = "14232272113"
+
+# aws s3
+aws_access_key_id='AKIAULBW5F545X3NIB54',
+aws_secret_access_key='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',
+region_name='us-east-2' 

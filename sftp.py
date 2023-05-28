@@ -2,14 +2,13 @@ import psycopg2
 import csv
 import boto3
 from datetime import date
-
+import config
 conn = psycopg2.connect(
-    host="database-1.cueq5a3aruqx.us-east-2.rds.amazonaws.com",
-    database="postgres",
-    user="postgres",
-    password="Manonthemoon123"
+    host=config.pg_host,
+    database=config.pg_database,
+    user=config.pg_user,
+    password=config.pg_password
 )
-
 cur = conn.cursor()
 
 query = "SELECT category AS Category, AVG(price) AS Price FROM public.gundeals GROUP BY category"
