@@ -103,7 +103,7 @@ while True:
         if any(item in post.title for item in items_to_search):
             short_url = shorten_url(post.url)
             message = twilio_client.messages.create(
-                body=f"New post found: {short_url}",
+                body=f"New post found: {post.title},{short_url},{price}",
                 from_=twilio_phone_number,
                 to="14232272113"
             )
