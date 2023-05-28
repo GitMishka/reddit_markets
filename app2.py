@@ -2,8 +2,13 @@ import praw
 import pandas as pd
 import time
 import psycopg2
-from twilio.rest import Client
 import requests
+from twilio.rest import Client
+
+def shorten_url(url):
+    response = requests.get('http://tinyurl.com/api-create.php?url=' + url)
+    return response.text
+
 user_agent = "Searchbot_01"
 reddit = praw.Reddit(username="Searchbot_01",
                      password="aaaa1111",
@@ -93,17 +98,12 @@ while True:
         post_data['Price'] = price
 
         data.append(post_data)
-      
-
-        def shorten_url(url):
-            response = requests.get('http://tinyurl.com/api-create.php?url=' + url)
-            return response.text
 
         # If post title contains an item from the list, send a link via Twilio and insert into sent_gundeals
         if any(item in post.title for item in items_to_search):
             short_url = shorten_url(post.url)
             message = twilio_client.messages.create(
-                body=f"New post found: {post.short_url}",
+                body=f"New post found: {short_url}",
                 from_=twilio_phone_number,
                 to="14232272113"
             )
@@ -113,14 +113,21 @@ while True:
                 INSERT INTO sent_gundeals (id, title, post_time, url, price, category)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (id) DO NOTHING
-            """, (post_data['Post ID'], post_data['Post Title'], post_data['Post Time'], post_data['Post Link'], price, category))
+            """, (post_data['Post ID'], post_data['Post Title'], post_data['Post Time'], short_url, price, category))
 
     df = pd.DataFrame(data)
     print(posts)
     print(df)
 
-    # Add your code here to store posts data into the gundeals table
-    # ...
+    for post in data:
+        price = post['Price']
+        category = post['Category']
+
+        cur.execute("""
+            INSERT INTO gundeals (id, title, post_time, url, price, category)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (id) DO NOTHING
+        """, (post['Post ID'], post['Post Title'], post['Post Time'], post['Post Link'], price, category))
 
     conn.commit()
     time.sleep(600)
