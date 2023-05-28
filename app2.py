@@ -3,7 +3,7 @@ import pandas as pd
 import time
 import psycopg2
 from twilio.rest import Client
-
+import requests
 user_agent = "Searchbot_01"
 reddit = praw.Reddit(username="Searchbot_01",
                      password="aaaa1111",
@@ -51,7 +51,7 @@ twilio_phone_number = "+18334633894"
 twilio_client = Client(twilio_account_sid, twilio_auth_token)
 
 # Add your items here
-items_to_search = ["item1", "item2", "item3"]
+items_to_search = ["[Handgun]", "item2", "item3"]
 
 while True:
     posts = subreddit.new(limit=10)
@@ -93,11 +93,17 @@ while True:
         post_data['Price'] = price
 
         data.append(post_data)
+      
+
+        def shorten_url(url):
+            response = requests.get('http://tinyurl.com/api-create.php?url=' + url)
+            return response.text
 
         # If post title contains an item from the list, send a link via Twilio and insert into sent_gundeals
         if any(item in post.title for item in items_to_search):
+            short_url = shorten_url(post.url)
             message = twilio_client.messages.create(
-                body=f"New post found: {post.url}",
+                body=f"New post found: {post.short_url}",
                 from_=twilio_phone_number,
                 to="14232272113"
             )
