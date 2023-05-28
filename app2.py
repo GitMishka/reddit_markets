@@ -31,6 +31,17 @@ cur.execute("""
     )
 """)
 
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS sent_gundeals (
+        id TEXT PRIMARY KEY,
+        title TEXT,
+        post_time TIMESTAMP,
+        url TEXT,
+        price FLOAT,
+        category TEXT
+    )
+""")
+
 subreddit = reddit.subreddit('gundeals')
 
 # Add your Twilio details
@@ -40,7 +51,7 @@ twilio_phone_number = "+18334633894"
 twilio_client = Client(twilio_account_sid, twilio_auth_token)
 
 # Add your items here
-items_to_search = ["[Handgun]", "item2", "item3"]
+items_to_search = ["item1", "item2", "item3"]
 
 while True:
     posts = subreddit.new(limit=10)
@@ -53,12 +64,37 @@ while True:
             'Post Link': post.url
         }
        
-        # Add your code here to handle price and category extraction
-        # ...
+        category = ''
+        for char in post.title:
+            if char == ']':
+                break
+            elif char != ' ':
+                category += char
+        post_data['Category'] = category[1:] if category else None 
+
+        price = None
+        if '$' in post.title:
+            price_start = post.title.index('$') + 1
+            price_end = post.title.find(' ', price_start)
+            if price_end == -1:
+                price_end = len(post.title)
+            price_str = post.title[price_start:price_end]
+            price_str = price_str.replace(',', '')  
+            if 'K' in price_str:
+                try:
+                    price = int(float(price_str[:-1]) * 1000)
+                except ValueError:
+                    price = None
+            else:
+                try:
+                    price = float(price_str)
+                except ValueError:
+                    price = None
+        post_data['Price'] = price
 
         data.append(post_data)
 
-        # If post title contains an item from the list, send a link via Twilio
+        # If post title contains an item from the list, send a link via Twilio and insert into sent_gundeals
         if any(item in post.title for item in items_to_search):
             message = twilio_client.messages.create(
                 body=f"New post found: {post.url}",
@@ -66,11 +102,21 @@ while True:
                 to="14232272113"
             )
 
-    df = pd.DataFrame(data)
+            # Insert the post into the sent_gundeals table
+            cur.execute("""
+                INSERT INTO sent_gundeals (id, title, post_time, url, price, category)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT (id) DO NOTHING
+            """, (post_data['Post ID'], post_data['Post Title'], post_data['Post Time'], post_data['Post Link'], price, category))
 
-    # Add your code here to store posts data into the database
+    df = pd.DataFrame(data)
+    print(posts)
+    print(df)
+
+    # Add your code here to store posts data into the gundeals table
     # ...
 
+    conn.commit()
     time.sleep(600)
 
 cur.close()

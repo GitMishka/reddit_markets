@@ -1,0 +1,3 @@
+twilio_account_sid = "ACd2079bd46f13974225b28ef06255af01"
+twilio_auth_token = "fc48aa972b023395d213c11a148238c1"
+twilio_phone_number = "+18334633894"
