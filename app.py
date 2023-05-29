@@ -5,18 +5,18 @@ import time
 import psycopg2
 
 user_agent = "Searchbot_01"
-reddit = praw.Reddit(username="Searchbot_01",
-                     password="aaaa1111",
-                     client_id="Ai32qfXNqvGuMEvHFFMlAw",
-                     client_secret="IG5XKjyUGkcG2cgXfBSwVvalMTxFRg",
+reddit = praw.Reddit(username="",
+                     password="",
+                     client_id="",
+                     client_secret="",
                      user_agent=user_agent,
                      check_for_async=False)
 
 conn = psycopg2.connect(
-    host="database-1.cueq5a3aruqx.us-east-2.rds.amazonaws.com",
+    host="",
     database="postgres",
     user="postgres",
-    password="Manonthemoon123"
+    password=""
 )
 cur = conn.cursor()
 
