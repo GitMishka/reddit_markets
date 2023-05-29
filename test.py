@@ -6,10 +6,10 @@ import psycopg2
 
 # Connect to the database
 conn = psycopg2.connect(
-    host='database-1.cueq5a3aruqx.us-east-2.rds.amazonaws.com',
+    host='database-1..us-east-2.rds..com',
     database='db1',
     user='postgres',
-    password='Manonthemoon123'
+    password=''
 )
 
 cursor = conn.cursor()
