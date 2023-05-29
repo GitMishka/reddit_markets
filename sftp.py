@@ -27,8 +27,8 @@ with open(csv_filename, 'w', newline='') as csvfile:
 
 s3 = boto3.client(
     's3',
-    aws_access_key_id='AKIAULBW5F545X3NIB54',
-    aws_secret_access_key='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',
+    aws_access_key_id='',
+    aws_secret_access_key='',
     region_name='us-east-2' 
 )
 
