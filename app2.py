@@ -4,7 +4,7 @@ import time
 import psycopg2
 import requests
 from twilio.rest import Client
-import config  # import the config module
+import config  
 
 def shorten_url(url):
     response = requests.get('http://tinyurl.com/api-create.php?url=' + url)
@@ -54,7 +54,6 @@ subreddit = reddit.subreddit('gundeals')
 
 twilio_client = Client(config.twilio_account_sid, config.twilio_auth_token)
 
-# Add your items here
 items_to_search = ["[Handgun]", "item2", "item3"]
 
 while True:
@@ -98,7 +97,6 @@ while True:
 
         data.append(post_data)
 
-        # If post title contains an item from the list, send a link via Twilio and insert into sent_gundeals
         if any(item in post.title for item in items_to_search):
             short_url = shorten_url(post.url)
             message = twilio_client.messages.create(
@@ -107,7 +105,6 @@ while True:
                 to=config.twilio_to_number
             )
 
-            # Insert the post into the sent_gundeals table
             cur.execute("""
                 INSERT INTO sent_gundeals (id, title, post_time, url, price, category)
                 VALUES (%s, %s, %s, %s, %s, %s)

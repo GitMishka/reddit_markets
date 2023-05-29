@@ -12,10 +12,8 @@ conn = psycopg2.connect(
     password='Manonthemoon123'
 )
 
-# Create a cursor object to execute SQL queries
 cursor = conn.cursor()
 
-# Create the 'avg_price' table
 create_table_query = '''
     CREATE TABLE IF NOT EXISTS avg_price (
         category VARCHAR(255),
@@ -29,7 +27,6 @@ try:
 except psycopg2.Error as err:
     print(f"Error creating table: {err}")
 
-# Commit the changes and close the cursor and connection
 conn.commit()
 cursor.close()
 conn.close()
